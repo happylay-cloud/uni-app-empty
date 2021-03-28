@@ -1,11 +1,15 @@
 <template>
 	<view class="content">
+		<!-- #ifdef MP-WEIXIN -->
 		<button open-type="getUserInfo" @getuserinfo="getUserInfo">
 			授权用户信息
 		</button>
+		<!-- #endif -->
+		<!-- #ifdef MP-WEIXIN -->
 		<button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" withCredentials="true">
 			授权手机号
 		</button>
+		<!-- #endif -->
 		<button @click="subscribeMessage">订阅消息</button>
 	</view>
 </template>
@@ -53,32 +57,33 @@
 			// 订阅消息
 			subscribeMessage() {
 				uni.getSetting({
-					// 是否获取用户订阅消息的订阅状态，默认false不返回
-					withSubscriptions: true, 
-					success(res) {
-						console.log('授权信息', res)
-						if (!res.subscriptionsSetting['mainSwitch']) {
-							// 打开设置页
-							uni.openSetting({ 
-								success(res) {
-									console.log('授权设置', res)
+						// 是否获取用户订阅消息的订阅状态，默认false不返回
+						withSubscriptions: true,
+						success(res) {
+							console.log("授权设置", res)
+							if (!res.subscriptionsSetting['mainSwitch']) {
+								// 打开设置页
+								uni.openSetting({
+									success(res) {
+										console.log("授权设置", res)
+									}
+								});
+							} else {
+								// 用户没有点击”总是保持以上，不再询问“则每次都会调起订阅消息
+								uni.requestSubscribeMessage({
+										tmplIds: ["模板ID","模板ID"
+											],
+											success(res) {
+												console.log("订阅模板", res)
+											}
+										})
 								}
-							});
-						} else {
-							// 用户没有点击”总是保持以上，不再询问“则每次都会调起订阅消息
-							uni.requestSubscribeMessage({
-								tmplIds: ['模板ID'],
-								success(res) {
-									console.log('订阅模板', res)
-								}
-							})
-						}
-					}
-				})
-				// 结束
-			},
+							}
+						})
+					// 结束
+				},
+			}
 		}
-	}
 </script>
 
 <style lang="scss" scoped>
